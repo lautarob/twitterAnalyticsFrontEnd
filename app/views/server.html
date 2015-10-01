@@ -1,0 +1,83 @@
+<div class="container-fluid" ng-controller="ServerCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Home</h1>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            About This Project
+        </div>
+        <div class="panel-body">
+            <div class="alert alert-info" role="alert">
+                <h1>Hello!</h1>
+                <p style="margin-bottom:40px">
+                    We hope you find this site comfortable. I would like to make an introduction about the project before you begin to test the platform.
+                    Tweet Event Application , born as an idea for a project in a subject of my university. The main idea was to create a platform to obtain information through the Twitter API and through data mining techniques and specialized algorithms to provide the user with an approach on the issues that have been a "trend" for users Twitter.
+                    This would be a brief introduction , but I invite you to try the tool, analyze results, and share your experience with us.
+
+                </p>
+                <h4>Bengochea, Joaquin - Bertuzzi, Lautaro - Suarez, Daniel</h4>
+            </div>
+        </div>
+    </div>
+
+   
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Server Control Panel
+        </div>
+        <div class="panel-body">
+          
+            <div style ="float:left">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="button" ng-click="addNewItem(row)" class="btn btn-success ">
+                            <i class="glyphicon glyphicon-plus"></i> Add Filter
+                        </button>                   
+                     </span>
+                    <input type="text" class="form-control" id="filter" ng-model="filter" style="width:200px">
+                </div>
+               
+               
+            </div>
+                <div>
+
+                  
+                    <center>
+                        <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th st-sort="filterTopic">Filter Topic</th>
+                                    <th st-sort="delete">Delete</th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in displayedCollection">
+                                    <td>{{row.filterTopic}}</td>
+                                    <td>
+                                        <button type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger">
+                                            <i class="glyphicon glyphicon-remove-circle">
+                                            </i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </center>
+
+            </div>
+            <center>
+                <span>
+                    <button type="button" ng-click="startService()" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-play"></span> Start Service</button>
+                    <button type="button" ng-click="stopService()" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-stop"></span> Stop Service</button>
+                </span>
+            </center>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+    <!-- /.row -->
+</div>
+<!-- /.container-fluid -->
