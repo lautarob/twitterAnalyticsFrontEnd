@@ -1,12 +1,12 @@
 'use strict';
 /**
  * @ngdoc function
- * @name sbAdminApp.controller:ServerCtrl
+ * @name twitterApp.controller:ServerCtrl
  * @description
  * # ServerCtrl
- * Controller of the sbAdminApp
+ * Controller of the twitterApp
  */
-angular.module('sbAdminApp')
+angular.module('twitterApp')
   .controller('ServerCtrl',function ($scope, $http) {
 
     var filterTopics = [];

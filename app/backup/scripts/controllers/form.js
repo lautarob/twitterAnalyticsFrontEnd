@@ -1,12 +1,12 @@
 'use strict';
 /**
  * @ngdoc function
- * @name sbAdminApp.controller:MainCtrl
+ * @name twitterApp.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the sbAdminApp
+ * Controller of the twitterApp
  */
-angular.module('sbAdminApp')
+angular.module('twitterApp')
   .controller('FormCtrl', function($scope) {
     
 });

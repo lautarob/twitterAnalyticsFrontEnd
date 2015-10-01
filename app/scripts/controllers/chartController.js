@@ -1,12 +1,12 @@
 'use strict';
 /**
  * @ngdoc function
- * @name sbAdminApp.controller:ChartCtrl
+ * @name twitterApp.controller:ChartCtrl
  * @description
  * # ChartCtrl
- * Controller of the sbAdminApp
+ * Controller of the twitterApp
  */
-angular.module('sbAdminApp')
+angular.module('twitterApp')
   .controller('ChartCtrl', function ($scope, $http) {
 
         angular.element(document).ready(function () {
