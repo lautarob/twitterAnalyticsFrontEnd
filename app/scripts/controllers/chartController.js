@@ -85,7 +85,7 @@ angular.module('twitterApp')
         $scope.refreshTopic = function () {
             $scope.waitingDialog.show();
             setTimeout(function () {
-                getBarchartByTopicsDated();
+                getStatsByTopicsAndMonth();
             }, 1000);
         }
 
@@ -103,6 +103,163 @@ angular.module('twitterApp')
             setTimeout(function () {
                 getBarchartByDated();
             }, 1000);
+        }
+
+        function getStatsByTopicsDated() {
+
+            var Filter = { dateFrom: $scope.datePickersDates.dateFromTopic, dateTo: $scope.datePickersDates.dateToTopic }
+            var path = 'http://localhost:1338';
+
+            $.when($.ajax({
+                      type: 'POST',
+                      url: path + '/stats/statsByTopics',
+                      data: JSON.stringify(Filter),
+                      contentType: 'application/json',
+                      success: function (results) {
+
+                        var labelsTopics = [];
+                        var dataCountTopics = [];
+
+                        if(results.length > 0){
+                            for ( var i = 0, l = 10; i < l; i++ ){
+                                labelsTopics.push(results[i]["_id"]);
+                                dataCountTopics.push(results[i]["count"]);
+                            };
+                        }
+
+                        var ctx = $("#topicsBarChart").get(0).getContext("2d");
+                        var ctx2 = $("#topicsRadarChart").get(0).getContext("2d");
+
+
+
+                        var data = {
+                                labels: labelsTopics,
+                                datasets: [
+                                    {
+                                        label: "My First dataset",
+                                        fillColor: "rgba(151,187,205,0.5)",
+                                        strokeColor: "rgba(151,187,205,0.8)",
+                                        highlightFill: "rgba(151,187,205,0.75)",
+                                        highlightStroke: "rgba(151,187,205,1)",
+                                        data: dataCountTopics
+                                    }
+                                ]
+                        };
+
+                        var data2 = {
+                            labels: labelsTopics,
+                            datasets: [
+                                {
+                                    label: "My Second dataset",
+                                    fillColor: "rgba(151,187,205,0.2)",
+                                    strokeColor: "rgba(151,187,205,1)",
+                                    pointColor: "rgba(151,187,205,1)",
+                                    pointStrokeColor: "#fff",
+                                    pointHighlightFill: "#fff",
+                                    pointHighlightStroke: "rgba(151,187,205,1)",
+                                    data: dataCountTopics
+                                }
+                            ]
+                        };
+
+
+                        var topicsBarChart = new Chart(ctx).Bar(data, {});
+                        var topicsRadarChart = new Chart(ctx2).Radar(data2, {});
+
+
+
+
+                          $scope.$apply();
+
+                      }
+            })).always(function ()
+            {
+                $scope.waitingDialog.hide();
+            })
+        }
+
+        function getStatsByTopicsAndMonth() {
+
+            var Filter = { dateFrom: $scope.datePickersDates.dateFromTopic, dateTo: $scope.datePickersDates.dateToTopic }
+            var path = 'http://localhost:1338';
+
+            $.when($.ajax({
+                      type: 'POST',
+                      url: path + '/stats/statsByTopicsAndMonth',
+                      data: JSON.stringify(Filter),
+                      contentType: 'application/json',
+                      success: function (results) {
+
+                        var labelsTopics = [];
+                        var dataCountTopics = [];
+
+                        if(results.length > 0){
+                            for ( var i = 0, l = results.length; i < l; i++ ){
+                                var index = 0;
+                                index += labelsTopics.indexOf(results[i]["_id"]["topic"])
+                                if(index != -1)
+                                {
+                                    dataCountTopics[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                                }
+                                else
+                                {
+                                    labelsTopics.push(results[i]["_id"]["topic"]);
+                                    var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
+                                    dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                                    dataCountTopics.push(dataNew);
+                                }
+                            };
+                        }
+
+                        var topTopics = labelsTopics.slice(0,4);
+                        var topData = dataCountTopics.slice(0,4);
+
+                        var topDatasets = [];
+
+                        for ( var i = 0, l = topTopics.length; i < l; i++ ){
+
+                            topDatasets.push(
+                                    {
+                                        label: topTopics[i],
+                                        fillColor: "rgba(151,187,205,0.2)",
+                                        strokeColor: "rgba(151,187,205,1)",
+                                        pointColor: "rgba(151,187,205,1)",
+                                        pointStrokeColor: "#fff",
+                                        pointHighlightFill: "#fff",
+                                        pointHighlightStroke: "rgba(151,187,205,1)",
+                                        data: topData[i]
+                                    }
+                                );
+
+                        }
+
+
+
+                        var ctx = $("#topicsLineChart").get(0).getContext("2d");
+
+                        var data = {
+                                labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
+                                datasets: topDatasets
+                        };
+
+                        var topicsLineChart = new Chart(ctx).Line(data, {});
+
+                          $scope.$apply();
+
+                      }
+            })).always(function ()
+            {
+                $scope.waitingDialog.hide();
+            })
+        }
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF'.split('');
+            var color = '#';
+            for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
         }
 
 
