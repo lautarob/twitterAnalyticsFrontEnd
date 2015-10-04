@@ -24,36 +24,37 @@ angular.module('twitterApp')
 
         // Attributes //
         $scope.datePickers = {
-            dateFromCountry: false,
-            dateToCountry: false,
             dateFromTopic: false,
             dateToTopic: false,
             dateFromHashTag: false,
             dateToHashTag: false,
             dateFromUser: false,
             dateToUser: false,
-            dateFromCountryTopic: false,
-            dateToCountryTopic: false,
-            dateFromDated: false,
-            dateToDated: false,
             dateFromPersons: false,
             dateToPersons: false
         }
 
+        var topicsBarChart = null
+        var topicsRadarChart = null
+        var topicsLineChart = null
+        var hashTagsBarChart = null
+        var hashTagsRadarChart = null
+        var hashTagsLineChart = null
+        var usersBarChart = null
+        var usersRadarChart = null
+        var usersLineChart = null
+        var personsBarChart = null
+        var personsRadarChart = null
+        var personsLineChart = null
+
         $scope.datePickersDates =
         {
-            dateFromCountry: moment().format('MM-DD-YYYY'),
-            dateToCountry: moment().add(15,'days').format('MM-DD-YYYY'),
             dateFromTopic: moment().format('MM-DD-YYYY'),
             dateToTopic: moment().add(15, 'days').format('MM-DD-YYYY'),
             dateFromHashTag: moment().format('MM-DD-YYYY'),
             dateToHashTag: moment().add(15, 'days').format('MM-DD-YYYY'),
             dateFromUser: moment().format('MM-DD-YYYY'),
             dateToUser: moment().add(15, 'days').format('MM-DD-YYYY'),
-            dateFromCountryTopic: moment().format('MM-DD-YYYY'),
-            dateToCountryTopic: moment().add(15, 'days').format('MM-DD-YYYY'),
-            dateFromDated: moment().format('MM-DD-YYYY'),
-            dateToDated: moment().add(15, 'days').format('MM-DD-YYYY'),
             dateFromPersons: moment().format('MM-DD-YYYY'),
             dateToPersons: moment().add(15, 'days').format('MM-DD-YYYY')
         }
@@ -74,14 +75,6 @@ angular.module('twitterApp')
 
             $scope.datePickers[datePicker] = !$scope.datePickers[datePicker];
         };
-
-        $scope.refreshCountry = function()
-        {
-            $scope.waitingDialog.show();
-            setTimeout(function () {
-                getBarchartByCountryDated();
-            }, 1000);
-        }
 
         $scope.refreshUser = function () {
             $scope.waitingDialog.show();
@@ -104,22 +97,6 @@ angular.module('twitterApp')
             setTimeout(function () {
                 getStatsByHashTagsAndMonth();
                 getStatsByHashTagsDated();
-            }, 1000);
-        }
-
-        $scope.refreshCountryTopic = function()
-        {
-            $scope.waitingDialog.show();
-            setTimeout(function () {
-                getBarchartByCountryAndTopicsDated();
-            }, 1000);
-        }
-
-        $scope.refreshDated = function()
-        {
-            $scope.waitingDialog.show();
-            setTimeout(function () {
-                getStatsByTopicsDated();
             }, 1000);
         }
 
@@ -148,8 +125,14 @@ angular.module('twitterApp')
                         var labelsTopics = [];
                         var dataCountTopics = [];
 
+                        if (topicsBarChart != null && topicsRadarChart != null)
+                        {
+                            topicsBarChart.destroy();
+                            topicsRadarChart.destroy();
+                        }
+
                         if(results.length > 0){
-                            for ( var i = 0, l = 10; i < l; i++ ){
+                            for ( var i = 0, l = 10; i < results.length && i < 10 ; i++ ){
                                 labelsTopics.push(results[i]["_id"]);
                                 dataCountTopics.push(results[i]["count"]);
                             };
@@ -190,14 +173,10 @@ angular.module('twitterApp')
                             ]
                         };
 
+                        topicsBarChart = new Chart(ctx).Bar(data, {});
+                        topicsRadarChart = new Chart(ctx2).Radar(data2, {});
 
-                        var topicsBarChart = new Chart(ctx).Bar(data, {});
-                        var topicsRadarChart = new Chart(ctx2).Radar(data2, {});
-
-
-
-
-                          $scope.$apply();
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -220,6 +199,11 @@ angular.module('twitterApp')
 
                         var labelsTopics = [];
                         var dataCountTopics = [];
+
+                        if (topicsLineChart != null)
+                        {
+                            topicsLineChart.destroy();
+                        }
 
                         if(results.length > 0){
                             for ( var i = 0, l = results.length; i < l; i++ ){
@@ -270,9 +254,9 @@ angular.module('twitterApp')
                                 datasets: topDatasets
                         };
 
-                        var topicsLineChart = new Chart(ctx).Line(data, {});
+                        topicsLineChart = new Chart(ctx).Line(data, {});
 
-                          $scope.$apply();
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -296,8 +280,14 @@ angular.module('twitterApp')
                         var labelsHashTags = [];
                         var dataCountHashTags = [];
 
+                        if (hashTagsBarChart != null && hashTagsRadarChart != null)
+                        {
+                            hashTagsBarChart.destroy();
+                            hashTagsRadarChart.destroy();
+                        }
+
                         if(results.length > 0){
-                            for ( var i = 0, l = 10; i < l; i++ ){
+                            for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
                                 labelsHashTags.push(results[i]["_id"]);
                                 dataCountHashTags.push(results[i]["count"]);
                             };
@@ -338,14 +328,10 @@ angular.module('twitterApp')
                             ]
                         };
 
+                        hashTagsBarChart = new Chart(ctx).Bar(data, {});
+                        hashTagsRadarChart = new Chart(ctx2).Radar(data2, {});
 
-                        var hashTagsBarChart = new Chart(ctx).Bar(data, {});
-                        var hashTagsRadarChart = new Chart(ctx2).Radar(data2, {});
-
-
-
-
-                          $scope.$apply();
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -368,6 +354,11 @@ angular.module('twitterApp')
 
                         var labelsHashTags = [];
                         var dataCountHashTags = [];
+
+                        if (hashTagsLineChart != null)
+                        {
+                            hashTagsLineChart.destroy();
+                        }
 
                         if(results.length > 0){
                             for ( var i = 0, l = results.length; i < l; i++ ){
@@ -418,9 +409,9 @@ angular.module('twitterApp')
                                 datasets: topDatasets
                         };
 
-                        var hashTagsLineChart = new Chart(ctx).Line(data, {});
+                        hashTagsLineChart = new Chart(ctx).Line(data, {});
 
-                          $scope.$apply();
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -445,8 +436,14 @@ angular.module('twitterApp')
                         var labelsUsers = [];
                         var dataCountUsers = [];
 
+                        if (usersBarChart != null && usersRadarChart != null)
+                        {
+                            usersBarChart.destroy();
+                            usersRadarChart.destroy();
+                        }
+
                         if(results.length > 0){
-                            for ( var i = 0, l = 10; i < l; i++ ){
+                            for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
                                 labelsUsers.push(results[i]["_id"]);
                                 dataCountUsers.push(results[i]["count"]);
                             };
@@ -487,14 +484,10 @@ angular.module('twitterApp')
                             ]
                         };
 
+                        usersBarChart = new Chart(ctx).Bar(data, {});
+                        usersRadarChart = new Chart(ctx2).Radar(data2, {});
 
-                        var usersBarChart = new Chart(ctx).Bar(data, {});
-                        var usersRadarChart = new Chart(ctx2).Radar(data2, {});
-
-
-
-
-                          $scope.$apply();
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -517,6 +510,11 @@ angular.module('twitterApp')
 
                         var labelsUsers = [];
                         var dataCountUsers = [];
+
+                        if (usersLineChart != null)
+                        {
+                            usersLineChart.destroy();
+                        }
 
                         if(results.length > 0){
                             for ( var i = 0, l = results.length; i < l; i++ ){
@@ -567,9 +565,9 @@ angular.module('twitterApp')
                                 datasets: topDatasets
                         };
 
-                        var usersLineChart = new Chart(ctx).Line(data, {});
+                        usersLineChart = new Chart(ctx).Line(data, {});
 
-                          $scope.$apply();
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -595,8 +593,14 @@ angular.module('twitterApp')
                         var labelsPersons = [];
                         var dataCountPersons = [];
 
+                        if (personsBarChart != null && personsRadarChart != null)
+                        {
+                            personsBarChart.destroy();
+                            personsRadarChart.destroy();
+                        }
+
                         if(results.length > 0){
-                            for ( var i = 0, l = 10; i < l; i++ ){
+                            for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
                                 labelsPersons.push(results[i]["_id"]);
                                 dataCountPersons.push(results[i]["count"]);
                             };
@@ -637,14 +641,10 @@ angular.module('twitterApp')
                             ]
                         };
 
+                        personsBarChart = new Chart(ctx).Bar(data, {});
+                        personsRadarChart = new Chart(ctx2).Radar(data2, {});
 
-                        var personsBarChart = new Chart(ctx).Bar(data, {});
-                        var personsRadarChart = new Chart(ctx2).Radar(data2, {});
-
-
-
-
-                          $scope.$apply();
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -667,6 +667,11 @@ angular.module('twitterApp')
 
                         var labelsPersons = [];
                         var dataCountPersons = [];
+
+                        if (personsLineChart != null)
+                        {
+                            personsLineChart.destroy();
+                        }
 
                         if(results.length > 0){
                             for ( var i = 0, l = results.length; i < l; i++ ){
@@ -717,9 +722,10 @@ angular.module('twitterApp')
                                 datasets: topDatasets
                         };
 
-                        var personsLineChart = new Chart(ctx).Line(data, {});
+                        personsLineChart = new Chart(ctx).Line(data, {});
 
-                          $scope.$apply();
+
+                        $scope.$apply();
 
                       }
             })).always(function ()
@@ -727,12 +733,6 @@ angular.module('twitterApp')
                 $scope.waitingDialog.hide();
             })
         }
-
-       
-
-
-
-
 
 
         function getRandomColor() {
@@ -744,12 +744,6 @@ angular.module('twitterApp')
             return color;
         }
 
-
-           /**
-         * Module for displaying "Waiting for..." dialog using Bootstrap
-         *
-         * @author Eugene Maslovich <ehpc@em42.ru>
-         */
 
         $scope.waitingDialog = (function ($) {
 
@@ -765,13 +759,6 @@ angular.module('twitterApp')
                 '</div></div></div>');
 
             return {
-                /**
-                 * Opens our dialog
-                 * @param message Custom message
-                 * @param options Custom options:
-                 *                options.dialogSize - bootstrap postfix for dialog size, e.g. "sm", "m";
-                 *                options.progressType - bootstrap postfix for progress bar type, e.g. "success", "warning".
-                 */
                 show: function (message, options) {
                     // Assigning defaults
                     var settings = $.extend({
