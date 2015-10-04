@@ -632,6 +632,113 @@
                 </table>
             </tab>
 
+
+		<tab heading="Persons Charts">
+                <form id="personForm" method="post" class="form-horizontal">
+
+                    <table style="margin-top:10px">
+                        <tr>
+                            <td style="width:300px">
+                                <div class="form-group" style="margin-right:120px">
+                                    <label style="float:left" class="control-label">Date From:</label>
+                                    <div class="col-xs-5">
+                                        <p class="input-group">
+                                            <input style="width:150px" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="datePickersDates.dateFromPersons" is-open="datePickers.dateFromPersons" max-date="datePickersDates.dateToPersons" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-default" ng-click="open($event,'dateFromUser')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="width:300px">
+                                <div class="form-group">
+                                    <label style="float:left" class="control-label">Date To:</label>
+                                    <div class="col-xs-5">
+                                        <p class="input-group">
+                                            <input type="text" style="width:150px" class="form-control" datepicker-popup="{{format}}" ng-model="datePickersDates.dateToPersons" is-open="datePickers.dateToPersons" min-date="datePickersDates.dateFromPersons" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                                            <span class="input-group-btn">
+                                                <button style="margin-right:20px"type="button" class="btn btn-default" ng-click="open($event,'dateToPersons')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                <button class="btn btn-success btn-large" ng-click="refreshPersons()"><i class="icon-white icon-filter"></i> Refresh Graphics</button>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+                <table>
+                    <tr>
+                        <td style="width:auto">
+                            <div class="panel panel-default" style="margin-right:50px">
+                                <div class="panel-heading">
+                                    Bar Chart
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <canvas id="personsBarChart" width="500" height="400"></canvas>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+
+                        </td>
+                        <td style="width:auto">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    Radar Chart
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <canvas id="personsRadarChart" width="500" height="400"></canvas>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:auto">
+                            <div class="panel panel-default" style="margin-right:50px">
+                                <div class="panel-heading">
+                                    Line Chart
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <center>
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <canvas id="personsLineChart" width="500" height="400"></canvas>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </center>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+
+                        </td>
+                    </tr>
+                </table>
+            </tab>
+
+
 </tabset>
 
         
