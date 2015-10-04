@@ -35,7 +35,9 @@ angular.module('twitterApp')
             dateFromCountryTopic: false,
             dateToCountryTopic: false,
             dateFromDated: false,
-            dateToDated: false
+            dateToDated: false,
+            dateFromPersons: false,
+            dateToPersons: false
         }
 
         $scope.datePickersDates =
@@ -51,7 +53,9 @@ angular.module('twitterApp')
             dateFromCountryTopic: moment().format('MM-DD-YYYY'),
             dateToCountryTopic: moment().add(15, 'days').format('MM-DD-YYYY'),
             dateFromDated: moment().format('MM-DD-YYYY'),
-            dateToDated: moment().add(15, 'days').format('MM-DD-YYYY')
+            dateToDated: moment().add(15, 'days').format('MM-DD-YYYY'),
+            dateFromPersons: moment().format('MM-DD-YYYY'),
+            dateToPersons: moment().add(15, 'days').format('MM-DD-YYYY')
         }
 
         $scope.formats = ['MM-dd-yyyy','dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
@@ -118,6 +122,16 @@ angular.module('twitterApp')
                 getStatsByTopicsDated();
             }, 1000);
         }
+
+        $scope.refreshPersons = function()
+        {
+            $scope.waitingDialog.show();
+            setTimeout(function () {
+                getStatsByPersonsAndMonth();
+                getStatsByPersonsDated();
+            }, 1000);
+        }
+        
 
         function getStatsByTopicsDated() {
 
@@ -563,6 +577,163 @@ angular.module('twitterApp')
                 $scope.waitingDialog.hide();
             })
         }
+
+
+
+        function getStatsByPersonsDated() {
+
+            var Filter = { dateFrom: $scope.datePickersDates.dateFromPersons, dateTo: $scope.datePickersDates.dateToPersons }
+            var path = 'http://localhost:1338';
+
+            $.when($.ajax({
+                      type: 'POST',
+                      url: path + '/stats/statsByPersons',
+                      data: JSON.stringify(Filter),
+                      contentType: 'application/json',
+                      success: function (results) {
+
+                        var labelsPersons = [];
+                        var dataCountPersons = [];
+
+                        if(results.length > 0){
+                            for ( var i = 0, l = 10; i < l; i++ ){
+                                labelsPersons.push(results[i]["_id"]);
+                                dataCountPersons.push(results[i]["count"]);
+                            };
+                        }
+
+                        var ctx = $("#personsBarChart").get(0).getContext("2d");
+                        var ctx2 = $("#personsRadarChart").get(0).getContext("2d");
+
+
+
+                        var data = {
+                                labels: labelsPersons,
+                                datasets: [
+                                    {
+                                        label: "Persons Bar chart data set",
+                                        fillColor: "rgba(151,187,205,0.5)",
+                                        strokeColor: "rgba(151,187,205,0.8)",
+                                        highlightFill: "rgba(151,187,205,0.75)",
+                                        highlightStroke: "rgba(151,187,205,1)",
+                                        data: dataCountPersons
+                                    }
+                                ]
+                        };
+
+                        var data2 = {
+                            labels: labelsPersons,
+                            datasets: [
+                                {
+                                    label: "Persons Radar chart data set",
+                                    fillColor: "rgba(151,187,205,0.2)",
+                                    strokeColor: "rgba(151,187,205,1)",
+                                    pointColor: "rgba(151,187,205,1)",
+                                    pointStrokeColor: "#fff",
+                                    pointHighlightFill: "#fff",
+                                    pointHighlightStroke: "rgba(151,187,205,1)",
+                                    data: dataCountPersons
+                                }
+                            ]
+                        };
+
+
+                        var personsBarChart = new Chart(ctx).Bar(data, {});
+                        var personsRadarChart = new Chart(ctx2).Radar(data2, {});
+
+
+
+
+                          $scope.$apply();
+
+                      }
+            })).always(function ()
+            {
+                $scope.waitingDialog.hide();
+            })
+        }
+
+        function getStatsByPersonsAndMonth() {
+
+            var Filter = { dateFrom: $scope.datePickersDates.dateFromPersons, dateTo: $scope.datePickersDates.dateToPersons }
+            var path = 'http://localhost:1338';
+
+            $.when($.ajax({
+                      type: 'POST',
+                      url: path + '/stats/statsByPersonsAndMonth',
+                      data: JSON.stringify(Filter),
+                      contentType: 'application/json',
+                      success: function (results) {
+
+                        var labelsPersons = [];
+                        var dataCountPersons = [];
+
+                        if(results.length > 0){
+                            for ( var i = 0, l = results.length; i < l; i++ ){
+                                var index = 0;
+                                index += labelsPersons.indexOf(results[i]["_id"]["person"])
+                                if(index != -1)
+                                {
+                                    dataCountPersons[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                                }
+                                else
+                                {
+                                    labelsPersons.push(results[i]["_id"]["person"]);
+                                    var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
+                                    dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                                    dataCountPersons.push(dataNew);
+                                }
+                            };
+                        }
+
+                        var topPerson = labelsPersons.slice(0,4);
+                        var topData = dataCountPersons.slice(0,4);
+
+                        var topDatasets = [];
+
+                        for ( var i = 0, l = topPerson.length; i < l; i++ ){
+
+                            topDatasets.push(
+                                    {
+                                        label: topPerson[i],
+                                        fillColor: "rgba(151,187,205,0.2)",
+                                        strokeColor: "rgba(151,187,205,1)",
+                                        pointColor: "rgba(151,187,205,1)",
+                                        pointStrokeColor: "#fff",
+                                        pointHighlightFill: "#fff",
+                                        pointHighlightStroke: "rgba(151,187,205,1)",
+                                        data: topData[i]
+                                    }
+                                );
+
+                        }
+
+
+
+                        var ctx = $("#personsLineChart").get(0).getContext("2d");
+
+                        var data = {
+                                labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
+                                datasets: topDatasets
+                        };
+
+                        var personsLineChart = new Chart(ctx).Line(data, {});
+
+                          $scope.$apply();
+
+                      }
+            })).always(function ()
+            {
+                $scope.waitingDialog.hide();
+            })
+        }
+
+       
+
+
+
+
+
 
         function getRandomColor() {
             var letters = '0123456789ABCDEF'.split('');
