@@ -9,45 +9,6 @@
 angular.module('twitterApp')
   .controller('ServerCtrl',function ($scope, $http) {
 
-    var filterTopics = [];
-  
-    var id = 1;
-
-    function addItem(id,topic) {
-        return {
-            id: id,
-            filterTopic: topic
-        }
-    }
-
-    $scope.rowCollection = [];
-
-  
-
-    //copy the references (you could clone ie angular.copy but then have to go through a dirty checking for the matches)
-    $scope.displayedCollection = [].concat($scope.rowCollection);
-
-    //add to the real data holder
-    $scope.addNewItem = function addNewItem() {
-        $scope.rowCollection.push(addItem(id,$scope.filter));
-        id++;
-        $scope.displayedCollection = [].concat($scope.rowCollection);
-
-        $scope.filter = '';
-
-    };
-
-    //remove to the real data holder
-    $scope.removeItem = function removeItem(row) {
-        var index = $scope.rowCollection.indexOf(row);
-        if (index !== -1) {
-            $scope.rowCollection.splice(index, 1);
-            $scope.displayedCollection = [].concat($scope.rowCollection);
-
-        }
-    }
-   
-
     $scope.startService = function()
     {
         startService();
@@ -59,40 +20,53 @@ angular.module('twitterApp')
 
 
     function startService() {
-        var filters = [];
-        for (var i = 0; i < $scope.rowCollection.length;i++)
-        {
-            filters.push($scope.rowCollection[i].filterTopic);
-        }
-        var Filter = { FilterTweets: filters }
-        var path = 'http://localhost:7490';
+        var serviceSettings = $scope.filter;
+        var path = 'http://localhost:1337';
         $.when(
         $.ajax({
             type: 'POST',
-            data: JSON.stringify(Filter),
+            data: serviceSettings,
             contentType: 'application/json',
-            url: path + '/api/TwitterStreaming/Start'
+            url: path + '/start',
+            success: function (response) {
+
+
+            },
+            fail: function()
+            {
+
+            }
+
         }));
 
     }
 
     function stopService() {
-        var path = 'http://localhost:7490';
+        var path = 'http://localhost:1337';
         $.when(
         $.ajax({
-            type: 'GET',
-            url: path + '/api/TwitterStreaming/Stop'
+            type: 'POST',
+            url: path + '/stop',
+            success: function (response) {
+
+
+            },
+            fail: function()
+            {
+
+            }
+
         }));
 
     }
 
     function statusService() {
-        var path = 'http://localhost:7490';
+        var path = 'http://localhost:1337';
         $.ajax({
             type: 'GET',
-            url: path + '/api/TwitterStreaming/Status',
+            url: path + '/status',
             contentType: 'application/json',
-            success: function (status) {
+            success: function (response) {
 
             },
             fail: function()

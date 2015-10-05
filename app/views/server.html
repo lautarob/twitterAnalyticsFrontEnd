@@ -28,53 +28,32 @@
         <div class="panel-heading">
             Server Control Panel
         </div>
+        <div class="alert alert-warning"><center><strong>ACA ESTAMOS JUGANDO</strong></center></div>
+
         <div class="panel-body">
-          
-            <div style ="float:left">
-                <div class="input-group">
-                    <span class="input-group-btn">
-                        <button type="button" ng-click="addNewItem(row)" class="btn btn-success ">
-                            <i class="glyphicon glyphicon-plus"></i> Add Filter
-                        </button>                   
-                     </span>
-                    <input type="text" class="form-control" id="filter" ng-model="filter" style="width:200px">
-                </div>
-               
-               
-            </div>
-                <div>
-
-                  
-                    <center>
-                        <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th st-sort="filterTopic">Filter Topic</th>
-                                    <th st-sort="delete">Delete</th>
-                                </tr>
-
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="row in displayedCollection">
-                                    <td>{{row.filterTopic}}</td>
-                                    <td>
-                                        <button type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger">
-                                            <i class="glyphicon glyphicon-remove-circle">
-                                            </i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </center>
-
-            </div>
-            <center>
-                <span>
-                    <button type="button" ng-click="startService()" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-play"></span> Start Service</button>
-                    <button type="button" ng-click="stopService()" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-stop"></span> Stop Service</button>
-                </span>
-            </center>
+            <table>
+                <tr>
+                    <td>
+                        <div style ="float:left">
+                            <div class="input-group">
+                                <textarea class="form-control" id="filter" ng-model="filter" style="width:585%; height:200px"></textarea>
+                            </div>             
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                       <div>
+                            <center>
+                                <span>
+                                    <button type="button" ng-click="startService()" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-play"></span> Start Service</button>
+                                    <button type="button" ng-click="stopService()" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-stop"></span> Stop Service</button>
+                                </span>
+                            </center>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
     <!-- /.col-lg-12 -->
