@@ -14,6 +14,7 @@ angular.module('twitterApp')
             var nowPlus = moment().add(15,'days');
 
             CheckScopeBeforeApply();
+
         });
 
         function CheckScopeBeforeApply() {
