@@ -47,6 +47,7 @@ angular.module('twitterApp')
         var personsBarChart = null
         var personsRadarChart = null
         var personsLineChart = null
+        var maxDayBarChart = null
 
         $scope.datePickersDates =
         {
@@ -107,6 +108,14 @@ angular.module('twitterApp')
             setTimeout(function () {
                 getStatsByPersonsAndMonth();
                 getStatsByPersonsDated();
+            }, 1000);
+        }
+
+        $scope.refreshWeekStats = function()
+        {
+            $scope.waitingDialog.show();
+            setTimeout(function () {
+                getStatsByWeek();
             }, 1000);
         }
         
@@ -725,6 +734,118 @@ angular.module('twitterApp')
 
                         personsLineChart = new Chart(ctx).Line(data, {});
 
+
+                        $scope.$apply();
+
+                      }
+            })).always(function ()
+            {
+                $scope.waitingDialog.hide();
+            })
+        }
+
+        function getObjectArray(tweets, topics) {
+			var result = [];
+			var found  = false;
+			for (var i = 0; i < topics.length; i++){
+				var topic = topics[i];
+				var currentData = [];
+				var currentDay = tweets[0]["_id"]["day"];
+				for	(var j = 0; j < tweets.length; j++){
+					if(tweets[j]["_id"]["day"] == currentDay){
+						if(tweets[j]["_id"]["topic"] == topic){
+							currentData.push(tweets[j]["count"])
+							found = true;	
+						}
+					}
+					else{
+						currentDay = tweets[j]["_id"]["day"];
+						j--;
+						if(!found){
+							currentData.push(0);
+						}
+						found = false;
+					}				
+				}
+				result.push({
+					name: topic,
+					data: currentData	
+				});
+			}  
+			return result;  
+		}
+
+
+        function getStatsByWeek() {
+
+            var path = 'http://localhost:1338';
+
+            var today = new Date()
+            var dateTo = new Date(today);
+		    dateTo.setDate(today.getDate()+1);
+
+		    var dateFrom = new Date();
+		    dateFrom.setDate(today.getDate()-8);
+
+            var Filter = { dateFrom: dateFrom, dateTo: dateTo }
+
+            $.when($.ajax({
+                      type: 'POST',
+                      url: path + '/stats/maxStatsByDay',
+                      data: JSON.stringify(Filter),
+                      contentType: 'application/json',
+                      success: function (results) {
+                      	 if(results.length > 0){
+                      	 	var category = [];
+                      	 	var topics = [];
+                      	 	var values = [];
+                      	 	var index = 0;
+                            var maxTopic = 2; //Cantidad de topicos nuevos por día en este caso 3 como mucho
+                            var max = 0;
+
+                      	 	category.push(results[index]["_id"]["day"]);
+                      	 	topics.push(results[index]["_id"]["topic"]);
+                            for ( var i = 1, l = results.length; i < l; i++ ){
+                        		if(category[index] != results[i]["_id"]["day"]){
+                    				category.push(results[i]["_id"]["day"]);
+                                    max = 0;
+                    				index++;
+                        		}
+                        		if($.inArray(results[i]["_id"]["topic"],topics) == -1 && maxTopic > max){
+                        			topics.push(results[i]["_id"]["topic"]);
+                                    max++;
+                        		}
+                            }
+                            var data = getObjectArray(results, topics);
+
+
+	                  		$('#maxDayBarChart').highcharts({
+						        chart: {
+						            type: 'bar'
+						        },
+						        title: {
+						            text: 'Weekly stats'
+						        },
+						        xAxis: {
+						            categories: category
+						        },
+						        yAxis: {
+						            min: 0,
+						            title: {
+						                text: 'Number of tweets'
+						            }
+						        },
+						        legend: {
+						            reversed: true
+						        },
+						        plotOptions: {
+						            series: {
+						                stacking: 'normal'
+						            }
+						        },
+						        series: data
+						    });
+                  		 }
 
                         $scope.$apply();
 
