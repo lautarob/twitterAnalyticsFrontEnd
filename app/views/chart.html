@@ -423,6 +423,49 @@
                     </tr>
                 </table>
             </tab>
+
+            <tab heading="Stats by week">
+                <form id="dayForm" method="post" class="form-horizontal">
+
+                    <table style="margin-top:10px">
+                        <tr>
+                            <td style="width:300px">
+                                <div class="form-group">
+                                    <div class="col-xs-5">
+                                        <p class="input-group">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-success btn-large" ng-click="refreshWeekStats()"><i class="icon-white icon-filter"></i> Refresh Graphic</button>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+                <table>
+                    <tr>
+                        <td style="width:auto">
+                            <div class="panel panel-default" style="margin-right:50px">
+                                <div class="panel-heading">
+                                    Stacked Bar Chart
+                                </div>
+                                <div class="panel-body">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <div id="maxDayBarChart" style="min-width: 900px; max-width: 900px; height: 600px; margin: 0 auto"></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>>
+                            </div>
+
+                        </td>
+                    </tr>	
+                </table>
+            </tab>
+
 </tabset>
 
         
