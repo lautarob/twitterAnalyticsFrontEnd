@@ -7,7 +7,7 @@
  * Controller of the twitterApp
  */
 angular.module('twitterApp')
-  .controller('ServerCtrl',function ($scope, $http) {
+  .controller('ServerCtrl',function ($scope, $http, serverInteractionService) {
 
     $scope.startService = function()
     {
@@ -18,61 +18,23 @@ angular.module('twitterApp')
         stopService();
     }
 
-
     function startService() {
         var serviceSettings = $scope.filter;
-        var path = 'http://localhost:1337';
-        $.when(
-        $.ajax({
-            type: 'POST',
-            data: serviceSettings,
-            contentType: 'application/json',
-            url: path + '/start',
-            success: function (response) {
-
-
-            },
-            fail: function()
-            {
-
-            }
-
-        }));
-
+        $.when(serverInteractionService.startService(Filter)).done(function(response){
+            console.log("Server Started");
+        });
     }
 
     function stopService() {
-        var path = 'http://localhost:1337';
-        $.when(
-        $.ajax({
-            type: 'POST',
-            url: path + '/stop',
-            success: function (response) {
-
-
-            },
-            fail: function()
-            {
-
-            }
-
-        }));
+        $.when(serverInteractionService.stopService(Filter)).done(function(response){
+            console.log("Server Stopped");
+        });
 
     }
 
     function statusService() {
-        var path = 'http://localhost:1337';
-        $.ajax({
-            type: 'GET',
-            url: path + '/status',
-            contentType: 'application/json',
-            success: function (response) {
-
-            },
-            fail: function()
-            {
-
-            }
+        $.when(serverInteractionService.statusService()).done(function(response){
+            console.log("Server Stopped");
         });
     }
 

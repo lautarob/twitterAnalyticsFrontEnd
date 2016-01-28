@@ -1,108 +1,108 @@
 'use strict';
 /**
  * @ngdoc function
- * @name twitterApp.service:ChartInformationService
+ * @name twitterApp.service:queryService
  * @description
- * # chartInformationService
+ * # queryService
  * Service of the twitterApp
  */
 angular.module('twitterApp')
-  .factory('chartInformationService', function($http) {
+  .factory('queryService', function($http,config) {
      return {
-      getStatsByTopicsDated: function(path,Filter) {
+      getStatsByTopicsDated: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByTopics',
+          url: config.QUERIES_SERVER + '/stats/statsByTopics',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })
       },
 
-      getStatsByTopicsAndMonth: function(path,Filter) {
+      getStatsByTopicsAndMonth: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByTopicsAndMonth',
+          url: config.QUERIES_SERVER + '/stats/statsByTopicsAndMonth',
           data: JSON.stringify(Filter),
           contentType: 'application/json',
         })
       },
 
-      getStatsByHashTagsDated: function(path,Filter) {
+      getStatsByHashTagsDated: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByHashTags',
+          url: config.QUERIES_SERVER + '/stats/statsByHashTags',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })
       },
 
-      getStatsByHashTagsAndMonth: function(path,Filter) {
+      getStatsByHashTagsAndMonth: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByHashTagsAndMonth',
+          url: config.QUERIES_SERVER + '/stats/statsByHashTagsAndMonth',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })
       },
 
-      getStatsByUsersDated: function(path,Filter) {
+      getStatsByUsersDated: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByUsers',
+          url: config.QUERIES_SERVER + '/stats/statsByUsers',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })
       },
 
-      getStatsByUsersAndMonth: function(path,Filter) {
+      getStatsByUsersAndMonth: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByUsersAndMonth',
+          url: config.QUERIES_SERVER + '/stats/statsByUsersAndMonth',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })
       },
 
-      getStatsByPersonsDated: function(path,Filter) {
+      getStatsByPersonsDated: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByPersons',
+          url: config.QUERIES_SERVER + '/stats/statsByPersons',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })
       },
 
-      getStatsByPersonsAndMonth: function(path,Filter) {
+      getStatsByPersonsAndMonth: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/statsByPersonsAndMonth',
+          url: config.QUERIES_SERVER + '/stats/statsByPersonsAndMonth',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })
       },
 
-      getStatsByWeek: function(path,Filter) {
+      getStatsByWeek: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
-          url: path + '/stats/maxStatsByDay',
+          url: config.QUERIES_SERVER + '/stats/maxStatsByDay',
           data: JSON.stringify(Filter),
           contentType: 'application/json'
         })

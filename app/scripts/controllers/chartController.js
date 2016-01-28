@@ -7,7 +7,7 @@
  * Controller of the twitterApp
  */
 angular.module('twitterApp')
-    .controller('ChartCtrl', function ($scope, $http,chartInformationService) {
+    .controller('ChartCtrl', function ($scope, $http, queryService) {
 
         angular.element(document).ready(function () {
             var now = moment();
@@ -122,8 +122,7 @@ angular.module('twitterApp')
         function getStatsByTopicsDated() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromTopic, dateTo: $scope.datePickersDates.dateToTopic }
-            var path = 'http://localhost:1338';
-            $.when(chartInformationService.getStatsByTopicsDated(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByTopicsDated(Filter)).done(function(results){
                 var labelsTopics = [];
                 var dataCountTopics = [];
 
@@ -181,9 +180,7 @@ angular.module('twitterApp')
         function getStatsByTopicsAndMonth() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromTopic, dateTo: $scope.datePickersDates.dateToTopic }
-            var path = 'http://localhost:1338';
-
-            $.when(chartInformationService.getStatsByTopicsAndMonth(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByTopicsAndMonth(Filter)).done(function(results){
 
                 var labelsTopics = [];
                 var dataCountTopics = [];
@@ -248,9 +245,7 @@ angular.module('twitterApp')
         function getStatsByHashTagsDated() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromHashTag, dateTo: $scope.datePickersDates.dateToHashTag }
-            var path = 'http://localhost:1338';
-
-            $.when(chartInformationService.getStatsByHashTagsDated(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByHashTagsDated(Filter)).done(function(results){
                 var labelsHashTags = [];
                 var dataCountHashTags = [];
 
@@ -313,9 +308,7 @@ angular.module('twitterApp')
         function getStatsByHashTagsAndMonth() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromHashTag, dateTo: $scope.datePickersDates.dateToHashTag }
-            var path = 'http://localhost:1338';
-
-            $.when(chartInformationService.getStatsByHashTagsAndMonth(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByHashTagsAndMonth(Filter)).done(function(results){
 
                 var labelsHashTags = [];
                 var dataCountHashTags = [];
@@ -382,9 +375,7 @@ angular.module('twitterApp')
         function getStatsByUsersDated() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromUser, dateTo: $scope.datePickersDates.dateToUser }
-            var path = 'http://localhost:1338';
-
-            $.when(chartInformationService.getStatsByUsersDated(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByUsersDated(Filter)).done(function(results){
 
                 var labelsUsers = [];
                 var dataCountUsers = [];
@@ -446,9 +437,7 @@ angular.module('twitterApp')
         function getStatsByUsersAndMonth() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromUser, dateTo: $scope.datePickersDates.dateToUser }
-            var path = 'http://localhost:1338';
-
-            $.when(chartInformationService.getStatsByUsersAndMonth(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByUsersAndMonth(Filter)).done(function(results){
 
                 var labelsUsers = [];
                 var dataCountUsers = [];
@@ -516,9 +505,7 @@ angular.module('twitterApp')
         function getStatsByPersonsDated() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromPersons, dateTo: $scope.datePickersDates.dateToPersons }
-            var path = 'http://localhost:1338';
-
-            $.when(chartInformationService.getStatsByPersonsDated(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByPersonsDated(Filter)).done(function(results){
 
                 var labelsPersons = [];
                 var dataCountPersons = [];
@@ -579,9 +566,7 @@ angular.module('twitterApp')
         function getStatsByPersonsAndMonth() {
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromPersons, dateTo: $scope.datePickersDates.dateToPersons }
-            var path = 'http://localhost:1338';
-
-            $.when(chartInformationService.getStatsByPersonsAndMonth(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByPersonsAndMonth(Filter)).done(function(results){
 
                 var labelsPersons = [];
                 var dataCountPersons = [];
@@ -642,9 +627,6 @@ angular.module('twitterApp')
         }
 
         function getStatsByWeek() {
-
-            var path = 'http://localhost:1338';
-
             var today = new Date()
             var dateTo = new Date(today);
             dateTo.setDate(today.getDate()+1);
@@ -654,7 +636,7 @@ angular.module('twitterApp')
 
             var Filter = { dateFrom: dateFrom, dateTo: dateTo }
 
-            $.when(chartInformationService.getStatsByWeek(path,Filter)).done(function(results){
+            $.when(queryService.getStatsByWeek(Filter)).done(function(results){
 
                 if(results.length > 0){
                     var category = [];

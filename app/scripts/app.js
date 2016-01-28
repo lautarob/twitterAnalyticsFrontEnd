@@ -14,6 +14,10 @@ angular
     'ui.bootstrap',
     'angular-loading-bar',
   ])
+   .constant('config', {
+    QUERIES_SERVER: 'http://localhost:1338',
+    STREAMING_SERVER: 'http://localhost:1337'
+  })
   .config(['$stateProvider','$urlRouterProvider','$ocLazyLoadProvider',function ($stateProvider,$urlRouterProvider,$ocLazyLoadProvider) {
     
     $ocLazyLoadProvider.config({
@@ -34,9 +38,7 @@ angular
                     name:'twitterApp',
                     files:[
                     'scripts/directives/header/header.js',
-                    'scripts/directives/header/header-notification/header-notification.js',
-                    'scripts/directives/sidebar/sidebar.js',
-                    'scripts/directives/sidebar/sidebar-search/sidebar-search.js'
+                    'scripts/directives/sidebar/sidebar.js'
                     ]
                 }),
                 $ocLazyLoad.load(
@@ -74,37 +76,6 @@ angular
             }
         }
     })
-      .state('dashboard.home',{
-        url:'/home',
-        controller: 'MainCtrl',
-        templateUrl:'views/dashboard/chart.html',
-        resolve: {
-          loadMyFiles:function($ocLazyLoad) {
-            return $ocLazyLoad.load({
-              name:'twitterApp',
-              files:[
-              'scripts/controllers/main.js',
-              'scripts/directives/timeline/timeline.js',
-              'scripts/directives/notifications/notifications.js',
-              'scripts/directives/chat/chat.js',
-              'scripts/directives/dashboard/stats/stats.js'
-              ]
-            })
-          }
-        }
-      })
-      .state('dashboard.form',{
-        templateUrl:'views/form.html',
-        url:'/form'
-    })
-      .state('dashboard.blank',{
-        templateUrl:'views/pages/blank.html',
-        url:'/blank'
-    })
-      .state('login',{
-        templateUrl:'views/pages/login.html',
-        url:'/login'
-    })
       .state('dashboard.chart',{
         templateUrl:'views/chart.html',
         url:'/chart',
@@ -122,7 +93,7 @@ angular
                 name:'twitterApp',
                 files:[
                   'scripts/controllers/chartController.js',
-                  'scripts/services/chartInformationService.js',
+                  'scripts/services/queryService.js',
                 ]
             })
           }
@@ -143,7 +114,10 @@ angular
             }),
             $ocLazyLoad.load({
                 name:'twitterApp',
-                files:['scripts/controllers/serverController.js']
+                files:[
+                  'scripts/controllers/serverController.js',
+                  'scripts/services/serverInteractionService.js'
+                ]
             })
           }
         }
@@ -168,30 +142,6 @@ angular
           }
         }
     })
-      .state('dashboard.panels-wells',{
-          templateUrl:'views/ui-elements/panels-wells.html',
-          url:'/panels-wells'
-      })
-      .state('dashboard.buttons',{
-        templateUrl:'views/ui-elements/buttons.html',
-        url:'/buttons'
-    })
-      .state('dashboard.notifications',{
-        templateUrl:'views/ui-elements/notifications.html',
-        url:'/notifications'
-    })
-      .state('dashboard.typography',{
-       templateUrl:'views/ui-elements/typography.html',
-       url:'/typography'
-   })
-      .state('dashboard.icons',{
-       templateUrl:'views/ui-elements/icons.html',
-       url:'/icons'
-   })
-      .state('dashboard.grid',{
-       templateUrl:'views/ui-elements/grid.html',
-       url:'/grid'
-   })
   }]);
 
     
