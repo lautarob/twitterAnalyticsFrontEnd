@@ -120,7 +120,10 @@ angular
             }),
             $ocLazyLoad.load({
                 name:'twitterApp',
-                files:['scripts/controllers/chartController.js']
+                files:[
+                  'scripts/controllers/chartController.js',
+                  'scripts/services/chartInformationService.js',
+                ]
             })
           }
         }

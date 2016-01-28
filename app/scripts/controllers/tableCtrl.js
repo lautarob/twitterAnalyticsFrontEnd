@@ -1,9 +1,9 @@
 'use strict';
 /**
  * @ngdoc function
- * @name twitterApp.controller:ChartCtrl
+ * @name twitterApp.controller:TableCtrl
  * @description
- * # ChartCtrl
+ * # TableCtrl
  * Controller of the twitterApp
  */
 angular.module('twitterApp')

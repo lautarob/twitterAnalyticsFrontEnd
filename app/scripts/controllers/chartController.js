@@ -7,14 +7,13 @@
  * Controller of the twitterApp
  */
 angular.module('twitterApp')
-  .controller('ChartCtrl', function ($scope, $http) {
+    .controller('ChartCtrl', function ($scope, $http,chartInformationService) {
 
         angular.element(document).ready(function () {
             var now = moment();
             var nowPlus = moment().add(15,'days');
 
             CheckScopeBeforeApply();
-
         });
 
         function CheckScopeBeforeApply() {
@@ -124,72 +123,56 @@ angular.module('twitterApp')
 
             var Filter = { dateFrom: $scope.datePickersDates.dateFromTopic, dateTo: $scope.datePickersDates.dateToTopic }
             var path = 'http://localhost:1338';
+            $.when(chartInformationService.getStatsByTopicsDated(path,Filter)).done(function(results){
+                var labelsTopics = [];
+                var dataCountTopics = [];
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByTopics',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+                if(results.length > 0){
+                  for ( var i = 0, l = 10; i < results.length && i < 10 ; i++ ){
+                    labelsTopics.push(results[i]["_id"]);
+                    dataCountTopics.push(results[i]["count"]);
+                  };
 
-                        var labelsTopics = [];
-                        var dataCountTopics = [];
+                    if (topicsBarChart != null && topicsRadarChart != null){
+                        topicsBarChart.destroy();
+                        topicsRadarChart.destroy();
+                    }
+                    var ctx = $("#topicsBarChart").get(0).getContext("2d");
+                    var ctx2 = $("#topicsRadarChart").get(0).getContext("2d");
+                    var data = {
+                        labels: labelsTopics,
+                        datasets: [
+                            {
+                                label: "Topics Bar chart data set",
+                                fillColor: "rgba(151,187,205,0.5)",
+                                strokeColor: "rgba(151,187,205,0.8)",
+                                highlightFill: "rgba(151,187,205,0.75)",
+                                highlightStroke: "rgba(151,187,205,1)",
+                                data: dataCountTopics
+                            }
+                        ]
+                    };
+                    var data2 = {
+                        labels: labelsTopics,
+                        datasets: [
+                            {
+                                label: "Topics Radar chart data set",
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: dataCountTopics
+                            }
+                        ]
+                    };
+                    topicsBarChart = new Chart(ctx).Bar(data, {});
+                    topicsRadarChart = new Chart(ctx2).Radar(data2, {});
+                }
+                $scope.$apply();
 
-                        if (topicsBarChart != null && topicsRadarChart != null)
-                        {
-                            topicsBarChart.destroy();
-                            topicsRadarChart.destroy();
-                        }
-
-                        if(results.length > 0){
-                            for ( var i = 0, l = 10; i < results.length && i < 10 ; i++ ){
-                                labelsTopics.push(results[i]["_id"]);
-                                dataCountTopics.push(results[i]["count"]);
-                            };
-                        }
-
-                        var ctx = $("#topicsBarChart").get(0).getContext("2d");
-                        var ctx2 = $("#topicsRadarChart").get(0).getContext("2d");
-
-
-
-                        var data = {
-                                labels: labelsTopics,
-                                datasets: [
-                                    {
-                                        label: "Topics Bar chart data set",
-                                        fillColor: "rgba(151,187,205,0.5)",
-                                        strokeColor: "rgba(151,187,205,0.8)",
-                                        highlightFill: "rgba(151,187,205,0.75)",
-                                        highlightStroke: "rgba(151,187,205,1)",
-                                        data: dataCountTopics
-                                    }
-                                ]
-                        };
-
-                        var data2 = {
-                            labels: labelsTopics,
-                            datasets: [
-                                {
-                                    label: "Topics Radar chart data set",
-                                    fillColor: "rgba(151,187,205,0.2)",
-                                    strokeColor: "rgba(151,187,205,1)",
-                                    pointColor: "rgba(151,187,205,1)",
-                                    pointStrokeColor: "#fff",
-                                    pointHighlightFill: "#fff",
-                                    pointHighlightStroke: "rgba(151,187,205,1)",
-                                    data: dataCountTopics
-                                }
-                            ]
-                        };
-
-                        topicsBarChart = new Chart(ctx).Bar(data, {});
-                        topicsRadarChart = new Chart(ctx2).Radar(data2, {});
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
+            }).always(function ()
             {
                 $scope.waitingDialog.hide();
             })
@@ -200,77 +183,64 @@ angular.module('twitterApp')
             var Filter = { dateFrom: $scope.datePickersDates.dateFromTopic, dateTo: $scope.datePickersDates.dateToTopic }
             var path = 'http://localhost:1338';
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByTopicsAndMonth',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+            $.when(chartInformationService.getStatsByTopicsAndMonth(path,Filter)).done(function(results){
 
-                        var labelsTopics = [];
-                        var dataCountTopics = [];
+                var labelsTopics = [];
+                var dataCountTopics = [];
 
-                        if (topicsLineChart != null)
+                if (topicsLineChart != null){
+                    topicsLineChart.destroy();
+                }
+
+                if(results.length > 0){
+                    for ( var i = 0, l = results.length; i < l; i++ ){
+                        var index = 0;
+                        index += labelsTopics.indexOf(results[i]["_id"]["topic"])
+                        if(index != -1)
                         {
-                            topicsLineChart.destroy();
+                            dataCountTopics[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
                         }
-
-                        if(results.length > 0){
-                            for ( var i = 0, l = results.length; i < l; i++ ){
-                                var index = 0;
-                                index += labelsTopics.indexOf(results[i]["_id"]["topic"])
-                                if(index != -1)
-                                {
-                                    dataCountTopics[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                }
-                                else
-                                {
-                                    labelsTopics.push(results[i]["_id"]["topic"]);
-                                    var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
-                                    dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                    dataCountTopics.push(dataNew);
-                                }
-                            };
+                        else
+                        {
+                            labelsTopics.push(results[i]["_id"]["topic"]);
+                            var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
+                            dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                            dataCountTopics.push(dataNew);
                         }
+                    };
 
-                        var topTopics = labelsTopics.slice(0,4);
-                        var topData = dataCountTopics.slice(0,4);
+                    var topTopics = labelsTopics.slice(0,4);
+                    var topData = dataCountTopics.slice(0,4);
+                    var topDatasets = [];
 
-                        var topDatasets = [];
+                    for ( var i = 0, l = topTopics.length; i < l; i++ ){
 
-                        for ( var i = 0, l = topTopics.length; i < l; i++ ){
+                        topDatasets.push(
+                        {
+                            label: topTopics[i],
+                            fillColor: "rgba(151,187,205,0.2)",
+                            strokeColor: "rgba(151,187,205,1)",
+                            pointColor: "rgba(151,187,205,1)",
+                            pointStrokeColor: "#fff",
+                            pointHighlightFill: "#fff",
+                            pointHighlightStroke: "rgba(151,187,205,1)",
+                            data: topData[i]
+                        });
+                    }
 
-                            topDatasets.push(
-                                    {
-                                        label: topTopics[i],
-                                        fillColor: "rgba(151,187,205,0.2)",
-                                        strokeColor: "rgba(151,187,205,1)",
-                                        pointColor: "rgba(151,187,205,1)",
-                                        pointStrokeColor: "#fff",
-                                        pointHighlightFill: "#fff",
-                                        pointHighlightStroke: "rgba(151,187,205,1)",
-                                        data: topData[i]
-                                    }
-                                );
+                    var ctx = $("#topicsLineChart").get(0).getContext("2d");
 
-                        }
+                    var data = {
+                            labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
+                            datasets: topDatasets
+                    };
 
+                    topicsLineChart = new Chart(ctx).Line(data, {});
+                }
+                $scope.$apply();
 
-
-                        var ctx = $("#topicsLineChart").get(0).getContext("2d");
-
-                        var data = {
-                                labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
-                                datasets: topDatasets
-                        };
-
-                        topicsLineChart = new Chart(ctx).Line(data, {});
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
-            {
+            }).always(function ()
+            {   
                 $scope.waitingDialog.hide();
             })
         }
@@ -280,71 +250,61 @@ angular.module('twitterApp')
             var Filter = { dateFrom: $scope.datePickersDates.dateFromHashTag, dateTo: $scope.datePickersDates.dateToHashTag }
             var path = 'http://localhost:1338';
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByHashTags',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+            $.when(chartInformationService.getStatsByHashTagsDated(path,Filter)).done(function(results){
+                var labelsHashTags = [];
+                var dataCountHashTags = [];
 
-                        var labelsHashTags = [];
-                        var dataCountHashTags = [];
+                if (hashTagsBarChart != null && hashTagsRadarChart != null)
+                {
+                    hashTagsBarChart.destroy();
+                    hashTagsRadarChart.destroy();
+                }
 
-                        if (hashTagsBarChart != null && hashTagsRadarChart != null)
-                        {
-                            hashTagsBarChart.destroy();
-                            hashTagsRadarChart.destroy();
-                        }
+                if(results.length > 0){
+                    for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
+                        labelsHashTags.push(results[i]["_id"]);
+                        dataCountHashTags.push(results[i]["count"]);
+                    };
 
-                        if(results.length > 0){
-                            for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
-                                labelsHashTags.push(results[i]["_id"]);
-                                dataCountHashTags.push(results[i]["count"]);
-                            };
-                        }
+                    var ctx = $("#hashTagsBarChart").get(0).getContext("2d");
+                    var ctx2 = $("#hashTagsRadarChart").get(0).getContext("2d");
 
-                        var ctx = $("#hashTagsBarChart").get(0).getContext("2d");
-                        var ctx2 = $("#hashTagsRadarChart").get(0).getContext("2d");
+                    var data = {
+                        labels: labelsHashTags,
+                        datasets: [
+                            {
+                                label: "HashTags Bar chart data set",
+                                fillColor: "rgba(151,187,205,0.5)",
+                                strokeColor: "rgba(151,187,205,0.8)",
+                                highlightFill: "rgba(151,187,205,0.75)",
+                                highlightStroke: "rgba(151,187,205,1)",
+                                data: dataCountHashTags
+                            }
+                        ]
+                    };
 
+                    var data2 = {
+                        labels: labelsHashTags,
+                        datasets: [
+                            {
+                                label: "HashTags Radar chart data set",
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: dataCountHashTags
+                            }
+                        ]
+                    };
 
+                    hashTagsBarChart = new Chart(ctx).Bar(data, {});
+                    hashTagsRadarChart = new Chart(ctx2).Radar(data2, {});
+                }
+                $scope.$apply();
 
-                        var data = {
-                                labels: labelsHashTags,
-                                datasets: [
-                                    {
-                                        label: "HashTags Bar chart data set",
-                                        fillColor: "rgba(151,187,205,0.5)",
-                                        strokeColor: "rgba(151,187,205,0.8)",
-                                        highlightFill: "rgba(151,187,205,0.75)",
-                                        highlightStroke: "rgba(151,187,205,1)",
-                                        data: dataCountHashTags
-                                    }
-                                ]
-                        };
-
-                        var data2 = {
-                            labels: labelsHashTags,
-                            datasets: [
-                                {
-                                    label: "HashTags Radar chart data set",
-                                    fillColor: "rgba(151,187,205,0.2)",
-                                    strokeColor: "rgba(151,187,205,1)",
-                                    pointColor: "rgba(151,187,205,1)",
-                                    pointStrokeColor: "#fff",
-                                    pointHighlightFill: "#fff",
-                                    pointHighlightStroke: "rgba(151,187,205,1)",
-                                    data: dataCountHashTags
-                                }
-                            ]
-                        };
-
-                        hashTagsBarChart = new Chart(ctx).Bar(data, {});
-                        hashTagsRadarChart = new Chart(ctx2).Radar(data2, {});
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
+            }).always(function ()
             {
                 $scope.waitingDialog.hide();
             })
@@ -355,76 +315,64 @@ angular.module('twitterApp')
             var Filter = { dateFrom: $scope.datePickersDates.dateFromHashTag, dateTo: $scope.datePickersDates.dateToHashTag }
             var path = 'http://localhost:1338';
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByHashTagsAndMonth',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+            $.when(chartInformationService.getStatsByHashTagsAndMonth(path,Filter)).done(function(results){
 
-                        var labelsHashTags = [];
-                        var dataCountHashTags = [];
+                var labelsHashTags = [];
+                var dataCountHashTags = [];
 
-                        if (hashTagsLineChart != null)
+                if (hashTagsLineChart != null){
+                    hashTagsLineChart.destroy();
+                }
+
+                if(results.length > 0){
+                    for ( var i = 0, l = results.length; i < l; i++ ){
+                        var index = 0;
+                        index += labelsHashTags.indexOf(results[i]["_id"]["hashTag"])
+                        if(index != -1)
                         {
-                            hashTagsLineChart.destroy();
+                            dataCountHashTags[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
                         }
-
-                        if(results.length > 0){
-                            for ( var i = 0, l = results.length; i < l; i++ ){
-                                var index = 0;
-                                index += labelsHashTags.indexOf(results[i]["_id"]["hashTag"])
-                                if(index != -1)
-                                {
-                                    dataCountHashTags[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                }
-                                else
-                                {
-                                    labelsHashTags.push(results[i]["_id"]["hashTag"]);
-                                    var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
-                                    dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                    dataCountHashTags.push(dataNew);
-                                }
-                            };
+                        else
+                        {
+                            labelsHashTags.push(results[i]["_id"]["hashTag"]);
+                            var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
+                            dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                            dataCountHashTags.push(dataNew);
                         }
+                    };
 
-                        var topHashTags = labelsHashTags.slice(0,4);
-                        var topData = dataCountHashTags.slice(0,4);
+                    var topHashTags = labelsHashTags.slice(0,4);
+                    var topData = dataCountHashTags.slice(0,4);
+                    var topDatasets = [];
 
-                        var topDatasets = [];
+                    for ( var i = 0, l = topHashTags.length; i < l; i++ ){
 
-                        for ( var i = 0, l = topHashTags.length; i < l; i++ ){
+                        topDatasets.push(
+                            {
+                                label: topHashTags[i],
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: topData[i]
+                            }
+                        );
 
-                            topDatasets.push(
-                                    {
-                                        label: topHashTags[i],
-                                        fillColor: "rgba(151,187,205,0.2)",
-                                        strokeColor: "rgba(151,187,205,1)",
-                                        pointColor: "rgba(151,187,205,1)",
-                                        pointStrokeColor: "#fff",
-                                        pointHighlightFill: "#fff",
-                                        pointHighlightStroke: "rgba(151,187,205,1)",
-                                        data: topData[i]
-                                    }
-                                );
+                    }
 
-                        }
+                    var ctx = $("#hashTagsLineChart").get(0).getContext("2d");
+                    var data = {
+                            labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
+                            datasets: topDatasets
+                    };
 
+                    hashTagsLineChart = new Chart(ctx).Line(data, {});
+                }
+                $scope.$apply();
 
-
-                        var ctx = $("#hashTagsLineChart").get(0).getContext("2d");
-
-                        var data = {
-                                labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
-                                datasets: topDatasets
-                        };
-
-                        hashTagsLineChart = new Chart(ctx).Line(data, {});
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
+            }).always(function ()
             {
                 $scope.waitingDialog.hide();
             })
@@ -436,71 +384,60 @@ angular.module('twitterApp')
             var Filter = { dateFrom: $scope.datePickersDates.dateFromUser, dateTo: $scope.datePickersDates.dateToUser }
             var path = 'http://localhost:1338';
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByUsers',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+            $.when(chartInformationService.getStatsByUsersDated(path,Filter)).done(function(results){
 
-                        var labelsUsers = [];
-                        var dataCountUsers = [];
+                var labelsUsers = [];
+                var dataCountUsers = [];
 
-                        if (usersBarChart != null && usersRadarChart != null)
-                        {
-                            usersBarChart.destroy();
-                            usersRadarChart.destroy();
-                        }
+                if (usersBarChart != null && usersRadarChart != null){
+                    usersBarChart.destroy();
+                    usersRadarChart.destroy();
+                }
 
-                        if(results.length > 0){
-                            for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
-                                labelsUsers.push(results[i]["_id"]);
-                                dataCountUsers.push(results[i]["count"]);
-                            };
-                        }
+                if(results.length > 0){
+                    for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
+                        labelsUsers.push(results[i]["_id"]);
+                        dataCountUsers.push(results[i]["count"]);
+                    };
 
-                        var ctx = $("#usersBarChart").get(0).getContext("2d");
-                        var ctx2 = $("#usersRadarChart").get(0).getContext("2d");
+                    var ctx = $("#usersBarChart").get(0).getContext("2d");
+                    var ctx2 = $("#usersRadarChart").get(0).getContext("2d");
+                    var data = {
+                        labels: labelsUsers,
+                        datasets: [
+                            {
+                                label: "Users Bar chart data set",
+                                fillColor: "rgba(151,187,205,0.5)",
+                                strokeColor: "rgba(151,187,205,0.8)",
+                                highlightFill: "rgba(151,187,205,0.75)",
+                                highlightStroke: "rgba(151,187,205,1)",
+                                data: dataCountUsers
+                            }
+                        ]
+                    };
 
+                    var data2 = {
+                        labels: labelsUsers,
+                        datasets: [
+                            {
+                                label: "Users Radar chart data set",
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: dataCountUsers
+                            }
+                        ]
+                    };
 
+                    usersBarChart = new Chart(ctx).Bar(data, {});
+                    usersRadarChart = new Chart(ctx2).Radar(data2, {});
+                }
+                $scope.$apply();
 
-                        var data = {
-                                labels: labelsUsers,
-                                datasets: [
-                                    {
-                                        label: "Users Bar chart data set",
-                                        fillColor: "rgba(151,187,205,0.5)",
-                                        strokeColor: "rgba(151,187,205,0.8)",
-                                        highlightFill: "rgba(151,187,205,0.75)",
-                                        highlightStroke: "rgba(151,187,205,1)",
-                                        data: dataCountUsers
-                                    }
-                                ]
-                        };
-
-                        var data2 = {
-                            labels: labelsUsers,
-                            datasets: [
-                                {
-                                    label: "Users Radar chart data set",
-                                    fillColor: "rgba(151,187,205,0.2)",
-                                    strokeColor: "rgba(151,187,205,1)",
-                                    pointColor: "rgba(151,187,205,1)",
-                                    pointStrokeColor: "#fff",
-                                    pointHighlightFill: "#fff",
-                                    pointHighlightStroke: "rgba(151,187,205,1)",
-                                    data: dataCountUsers
-                                }
-                            ]
-                        };
-
-                        usersBarChart = new Chart(ctx).Bar(data, {});
-                        usersRadarChart = new Chart(ctx2).Radar(data2, {});
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
+            }).always(function ()
             {
                 $scope.waitingDialog.hide();
             })
@@ -511,76 +448,64 @@ angular.module('twitterApp')
             var Filter = { dateFrom: $scope.datePickersDates.dateFromUser, dateTo: $scope.datePickersDates.dateToUser }
             var path = 'http://localhost:1338';
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByUsersAndMonth',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+            $.when(chartInformationService.getStatsByUsersAndMonth(path,Filter)).done(function(results){
 
-                        var labelsUsers = [];
-                        var dataCountUsers = [];
+                var labelsUsers = [];
+                var dataCountUsers = [];
 
-                        if (usersLineChart != null)
+                if (usersLineChart != null){
+                    usersLineChart.destroy();
+                }
+
+                if(results.length > 0){
+                    for ( var i = 0, l = results.length; i < l; i++ ){
+                        var index = 0;
+                        index += labelsUsers.indexOf(results[i]["_id"]["user"])
+                        if(index != -1)
                         {
-                            usersLineChart.destroy();
+                            dataCountUsers[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
                         }
-
-                        if(results.length > 0){
-                            for ( var i = 0, l = results.length; i < l; i++ ){
-                                var index = 0;
-                                index += labelsUsers.indexOf(results[i]["_id"]["user"])
-                                if(index != -1)
-                                {
-                                    dataCountUsers[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                }
-                                else
-                                {
-                                    labelsUsers.push(results[i]["_id"]["user"]);
-                                    var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
-                                    dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                    dataCountUsers.push(dataNew);
-                                }
-                            };
+                        else
+                        {
+                            labelsUsers.push(results[i]["_id"]["user"]);
+                            var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
+                            dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                            dataCountUsers.push(dataNew);
                         }
+                    };
 
-                        var topUsers = labelsUsers.slice(0,4);
-                        var topData = dataCountUsers.slice(0,4);
+                    var topUsers = labelsUsers.slice(0,4);
+                    var topData = dataCountUsers.slice(0,4);
+                    var topDatasets = [];
 
-                        var topDatasets = [];
+                    for ( var i = 0, l = topUsers.length; i < l; i++ ){
 
-                        for ( var i = 0, l = topUsers.length; i < l; i++ ){
+                        topDatasets.push(
+                            {
+                                label: topUsers[i],
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: topData[i]
+                            }
+                        );
 
-                            topDatasets.push(
-                                    {
-                                        label: topUsers[i],
-                                        fillColor: "rgba(151,187,205,0.2)",
-                                        strokeColor: "rgba(151,187,205,1)",
-                                        pointColor: "rgba(151,187,205,1)",
-                                        pointStrokeColor: "#fff",
-                                        pointHighlightFill: "#fff",
-                                        pointHighlightStroke: "rgba(151,187,205,1)",
-                                        data: topData[i]
-                                    }
-                                );
+                    }
 
-                        }
+                    var ctx = $("#usersLineChart").get(0).getContext("2d");
+                    var data = {
+                            labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
+                            datasets: topDatasets
+                    };
 
+                    usersLineChart = new Chart(ctx).Line(data, {});
+                }
+                $scope.$apply();
 
-
-                        var ctx = $("#usersLineChart").get(0).getContext("2d");
-
-                        var data = {
-                                labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
-                                datasets: topDatasets
-                        };
-
-                        usersLineChart = new Chart(ctx).Line(data, {});
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
+            }).always(function ()
             {
                 $scope.waitingDialog.hide();
             })
@@ -593,71 +518,59 @@ angular.module('twitterApp')
             var Filter = { dateFrom: $scope.datePickersDates.dateFromPersons, dateTo: $scope.datePickersDates.dateToPersons }
             var path = 'http://localhost:1338';
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByPersons',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+            $.when(chartInformationService.getStatsByPersonsDated(path,Filter)).done(function(results){
 
-                        var labelsPersons = [];
-                        var dataCountPersons = [];
+                var labelsPersons = [];
+                var dataCountPersons = [];
 
-                        if (personsBarChart != null && personsRadarChart != null)
-                        {
-                            personsBarChart.destroy();
-                            personsRadarChart.destroy();
-                        }
+                if (personsBarChart != null && personsRadarChart != null){
+                    personsBarChart.destroy();
+                    personsRadarChart.destroy();
+                }
 
-                        if(results.length > 0){
-                            for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
-                                labelsPersons.push(results[i]["_id"]);
-                                dataCountPersons.push(results[i]["count"]);
-                            };
-                        }
+                if(results.length > 0){
+                    for ( var i = 0, l = 10; i < results.length && i < 10; i++ ){
+                        labelsPersons.push(results[i]["_id"]);
+                        dataCountPersons.push(results[i]["count"]);
+                    };
 
-                        var ctx = $("#personsBarChart").get(0).getContext("2d");
-                        var ctx2 = $("#personsRadarChart").get(0).getContext("2d");
-
-
-
-                        var data = {
-                                labels: labelsPersons,
-                                datasets: [
-                                    {
-                                        label: "Persons Bar chart data set",
-                                        fillColor: "rgba(151,187,205,0.5)",
-                                        strokeColor: "rgba(151,187,205,0.8)",
-                                        highlightFill: "rgba(151,187,205,0.75)",
-                                        highlightStroke: "rgba(151,187,205,1)",
-                                        data: dataCountPersons
-                                    }
-                                ]
-                        };
-
-                        var data2 = {
+                    var ctx = $("#personsBarChart").get(0).getContext("2d");
+                    var ctx2 = $("#personsRadarChart").get(0).getContext("2d");
+                    var data = {
                             labels: labelsPersons,
                             datasets: [
                                 {
-                                    label: "Persons Radar chart data set",
-                                    fillColor: "rgba(151,187,205,0.2)",
-                                    strokeColor: "rgba(151,187,205,1)",
-                                    pointColor: "rgba(151,187,205,1)",
-                                    pointStrokeColor: "#fff",
-                                    pointHighlightFill: "#fff",
-                                    pointHighlightStroke: "rgba(151,187,205,1)",
+                                    label: "Persons Bar chart data set",
+                                    fillColor: "rgba(151,187,205,0.5)",
+                                    strokeColor: "rgba(151,187,205,0.8)",
+                                    highlightFill: "rgba(151,187,205,0.75)",
+                                    highlightStroke: "rgba(151,187,205,1)",
                                     data: dataCountPersons
                                 }
                             ]
-                        };
+                    };
 
-                        personsBarChart = new Chart(ctx).Bar(data, {});
-                        personsRadarChart = new Chart(ctx2).Radar(data2, {});
+                    var data2 = {
+                        labels: labelsPersons,
+                        datasets: [
+                            {
+                                label: "Persons Radar chart data set",
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: dataCountPersons
+                            }
+                        ]
+                    };
 
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
+                    personsBarChart = new Chart(ctx).Bar(data, {});
+                    personsRadarChart = new Chart(ctx2).Radar(data2, {});
+                }
+                $scope.$apply();
+            }).always(function ()
             {
                 $scope.waitingDialog.hide();
             })
@@ -668,77 +581,136 @@ angular.module('twitterApp')
             var Filter = { dateFrom: $scope.datePickersDates.dateFromPersons, dateTo: $scope.datePickersDates.dateToPersons }
             var path = 'http://localhost:1338';
 
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/statsByPersonsAndMonth',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
+            $.when(chartInformationService.getStatsByPersonsAndMonth(path,Filter)).done(function(results){
 
-                        var labelsPersons = [];
-                        var dataCountPersons = [];
+                var labelsPersons = [];
+                var dataCountPersons = [];
+                if (personsLineChart != null){
+                    personsLineChart.destroy();
+                }
 
-                        if (personsLineChart != null)
+                if(results.length > 0){
+                    for ( var i = 0, l = results.length; i < l; i++ ){
+                        var index = 0;
+                        index += labelsPersons.indexOf(results[i]["_id"]["person"])
+                        if(index != -1)
                         {
-                            personsLineChart.destroy();
+                            dataCountPersons[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
                         }
-
-                        if(results.length > 0){
-                            for ( var i = 0, l = results.length; i < l; i++ ){
-                                var index = 0;
-                                index += labelsPersons.indexOf(results[i]["_id"]["person"])
-                                if(index != -1)
-                                {
-                                    dataCountPersons[index][parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                }
-                                else
-                                {
-                                    labelsPersons.push(results[i]["_id"]["person"]);
-                                    var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
-                                    dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
-                                    dataCountPersons.push(dataNew);
-                                }
-                            };
+                        else
+                        {
+                            labelsPersons.push(results[i]["_id"]["person"]);
+                            var dataNew = [0,0,0,0,0,0,0,0,0,0,0,0];
+                            dataNew[parseInt(results[i]["_id"]["month"])-1] = results[i]["count"];
+                            dataCountPersons.push(dataNew);
                         }
+                    };
 
-                        var topPerson = labelsPersons.slice(0,4);
-                        var topData = dataCountPersons.slice(0,4);
+                    var topPerson = labelsPersons.slice(0,4);
+                    var topData = dataCountPersons.slice(0,4);
+                    var topDatasets = [];
 
-                        var topDatasets = [];
+                    for ( var i = 0, l = topPerson.length; i < l; i++ ){
 
-                        for ( var i = 0, l = topPerson.length; i < l; i++ ){
+                        topDatasets.push(
+                            {
+                                label: topPerson[i],
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: topData[i]
+                            }
+                        );
+                    }
 
-                            topDatasets.push(
-                                    {
-                                        label: topPerson[i],
-                                        fillColor: "rgba(151,187,205,0.2)",
-                                        strokeColor: "rgba(151,187,205,1)",
-                                        pointColor: "rgba(151,187,205,1)",
-                                        pointStrokeColor: "#fff",
-                                        pointHighlightFill: "#fff",
-                                        pointHighlightStroke: "rgba(151,187,205,1)",
-                                        data: topData[i]
-                                    }
-                                );
+                    var ctx = $("#personsLineChart").get(0).getContext("2d");
+                    var data = {
+                            labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
+                            datasets: topDatasets
+                    };
+                    personsLineChart = new Chart(ctx).Line(data, {});
+                }
+                $scope.$apply();
 
+            }).always(function ()
+            {
+                $scope.waitingDialog.hide();
+            })
+        }
+
+        function getStatsByWeek() {
+
+            var path = 'http://localhost:1338';
+
+            var today = new Date()
+            var dateTo = new Date(today);
+            dateTo.setDate(today.getDate()+1);
+
+            var dateFrom = new Date();
+            dateFrom.setDate(today.getDate()-8);
+
+            var Filter = { dateFrom: dateFrom, dateTo: dateTo }
+
+            $.when(chartInformationService.getStatsByWeek(path,Filter)).done(function(results){
+
+                if(results.length > 0){
+                    var category = [];
+                    var topics = [];
+                    var values = [];
+                    var index = 0;
+                    var maxTopic = 2; //Cantidad de topicos nuevos por día en este caso 3 como mucho
+                    var max = 0;
+
+                    category.push(results[index]["_id"]["day"]);
+                    topics.push(results[index]["_id"]["topic"]);
+                    for ( var i = 1, l = results.length; i < l; i++ ){
+                        if(category[index] != results[i]["_id"]["day"]){
+                            category.push(results[i]["_id"]["day"]);
+                            max = 0;
+                            index++;
                         }
+                        if($.inArray(results[i]["_id"]["topic"],topics) == -1 && maxTopic > max){
+                            topics.push(results[i]["_id"]["topic"]);
+                            max++;
+                        }
+                    }
+                    var data = getObjectArray(results, topics);
 
 
+                    $('#maxDayBarChart').highcharts({
+                        chart: {
+                            type: 'bar'
+                        },
+                        title: {
+                            text: 'Weekly stats'
+                        },
+                        xAxis: {
+                            categories: category
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: 'Number of tweets'
+                            }
+                        },
+                        legend: {
+                            reversed: true
+                        },
+                        plotOptions: {
+                            series: {
+                                stacking: 'normal'
+                            }
+                        },
+                        series: data
+                    });
+                 }
 
-                        var ctx = $("#personsLineChart").get(0).getContext("2d");
+                $scope.$apply();
 
-                        var data = {
-                                labels: ["January", "February", "March", "April", "May", "June", "July","August","September","October","November","December"],
-                                datasets: topDatasets
-                        };
-
-                        personsLineChart = new Chart(ctx).Line(data, {});
-
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
+            }).always(function ()
             {
                 $scope.waitingDialog.hide();
             })
@@ -776,85 +748,7 @@ angular.module('twitterApp')
 		}
 
 
-        function getStatsByWeek() {
-
-            var path = 'http://localhost:1338';
-
-            var today = new Date()
-            var dateTo = new Date(today);
-		    dateTo.setDate(today.getDate()+1);
-
-		    var dateFrom = new Date();
-		    dateFrom.setDate(today.getDate()-8);
-
-            var Filter = { dateFrom: dateFrom, dateTo: dateTo }
-
-            $.when($.ajax({
-                      type: 'POST',
-                      url: path + '/stats/maxStatsByDay',
-                      data: JSON.stringify(Filter),
-                      contentType: 'application/json',
-                      success: function (results) {
-                      	 if(results.length > 0){
-                      	 	var category = [];
-                      	 	var topics = [];
-                      	 	var values = [];
-                      	 	var index = 0;
-                            var maxTopic = 2; //Cantidad de topicos nuevos por día en este caso 3 como mucho
-                            var max = 0;
-
-                      	 	category.push(results[index]["_id"]["day"]);
-                      	 	topics.push(results[index]["_id"]["topic"]);
-                            for ( var i = 1, l = results.length; i < l; i++ ){
-                        		if(category[index] != results[i]["_id"]["day"]){
-                    				category.push(results[i]["_id"]["day"]);
-                                    max = 0;
-                    				index++;
-                        		}
-                        		if($.inArray(results[i]["_id"]["topic"],topics) == -1 && maxTopic > max){
-                        			topics.push(results[i]["_id"]["topic"]);
-                                    max++;
-                        		}
-                            }
-                            var data = getObjectArray(results, topics);
-
-
-	                  		$('#maxDayBarChart').highcharts({
-						        chart: {
-						            type: 'bar'
-						        },
-						        title: {
-						            text: 'Weekly stats'
-						        },
-						        xAxis: {
-						            categories: category
-						        },
-						        yAxis: {
-						            min: 0,
-						            title: {
-						                text: 'Number of tweets'
-						            }
-						        },
-						        legend: {
-						            reversed: true
-						        },
-						        plotOptions: {
-						            series: {
-						                stacking: 'normal'
-						            }
-						        },
-						        series: data
-						    });
-                  		 }
-
-                        $scope.$apply();
-
-                      }
-            })).always(function ()
-            {
-                $scope.waitingDialog.hide();
-            })
-        }
+        
 
 
         function getRandomColor() {
