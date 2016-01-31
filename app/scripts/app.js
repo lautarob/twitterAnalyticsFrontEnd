@@ -125,7 +125,7 @@ angular
       .state('dashboard.table',{
         templateUrl:'views/table.html',
         url:'/table',
-        controller:'TableCtrl',
+        controller:'TweetPanelCtrl',
         resolve: {
           loadMyFile:function($ocLazyLoad) {
             return $ocLazyLoad.load({
@@ -137,7 +137,10 @@ angular
             }),
             $ocLazyLoad.load({
                 name:'twitterApp',
-                files:['scripts/controllers/tableCtrl.js']
+                files:[
+                'scripts/controllers/tweetPanelCtrl.js',
+                'scripts/services/tweetPanelService.js',
+                ]
             })
           }
         }

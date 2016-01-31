@@ -1,17 +1,45 @@
 'use strict';
 /**
  * @ngdoc function
- * @name twitterApp.controller:TableCtrl
+ * @name twitterApp.controller:TweetPanelCtrl
  * @description
- * # TableCtrl
+ * # TweetPanelCtrl
  * Controller of the twitterApp
  */
 angular.module('twitterApp')
-  .controller('TableCtrl', function ($scope, $http) {
+  .controller('TweetPanelCtrl', function ($scope, $http,tweetPanelService) {
 
         angular.element(document).ready(function () {
 
-            $('#tweetsProcessed-table').DataTable()
+            $("#tweetsProcessed-table").jsGrid({
+                width: "100%",
+                height: "500",
+             
+                filtering: true,
+                sorting: true,
+                paging: true,
+                editing:true,
+                autoload: true,
+         
+                pageSize: 15,
+                pageButtonCount: 5,
+
+                controller: tweetPanelService,
+       
+                fields: [
+                    { name: "topics", type: "text", width: 100, editing: false, title: "Topics", css:"grid-cell-normal" },
+                    { name: "entities", type: "text", width: 100, editing: false, title: "Entities", css:"grid-cell-normal"  },
+                    { name: "persons", type: "text", width: 100, editing: false, title: "Persons", css:"grid-cell-normal" },
+                    { name: "hashTags", type: "text", width: 100, editing: false, title: "#HashTags", css:"grid-cell-normal"  },
+                    { name: "twitterUsers", type: "text", width: 100, editing: false, title: "@User", css:"grid-cell-normal"  },
+                    { name: "keyWords", type: "text", width: 100, editing: false, title: "KeyWords", css:"grid-cell-normal" },
+                    { name: "originalText", type: "text", width: 100, editing: false, title: "Text", css:"grid-cell-normal" },
+                    { name: "principal_topic", type: "text", width: 100, editing: true, title: "Principal Topic", css:"grid-cell-normal" },
+                    { name: "to_train", type: "checkbox", width: 75, editing: true, title: "To Train", css:"grid-cell-normal" },
+                    { type: "control", width: 75, deleteButton: false }
+
+                ]
+            });
 
         });
 
