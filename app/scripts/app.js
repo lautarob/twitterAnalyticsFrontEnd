@@ -25,7 +25,7 @@ angular
       events:true,
     });
 
-    $urlRouterProvider.otherwise('/dashboard/chart');
+    $urlRouterProvider.otherwise('/dashboard/server');
 
     $stateProvider
       .state('dashboard', {
