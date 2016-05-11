@@ -10,66 +10,103 @@ angular.module('twitterApp')
   .controller('ServerCtrl',function ($scope, $http, serverInteractionService) {
 
     angular.element(document).ready(function () {
-        $("[name='serverStatus']").bootstrapSwitch({
-          onText: 'Running',
-          offText: 'Stopped',
+        $("[name='svmTrained']").bootstrapSwitch({
+          onText: 'Yes',
+          offText: 'No',
           readOnly: true,
-          labelText: 'Server Status'
+          labelText: 'SVM Trained',
+          size: "large"
         });
-        serverRunning()
-        setInterval(function(){
-            serverRunning()
-        },5000);
+        $("[name='naiveBayesTrained']").bootstrapSwitch({
+          onText: 'Yes',
+          offText: 'No',
+          readOnly: true,
+          labelText: 'NB Trained',
+          size: "large"
+        });
+        $('#svmTrainButton').on('click', function(event) {
+          train("SVM");
+        });
+        $('#naiveBayesTrainButton').on('click', function(event) {
+          train("NaiveBayes");
+        });
+
+        checkTrainings();
     });
 
-    $scope.startService = function()
+    $scope.startStreamingAndClassificationService = function()
     {
-        startService();
-        $scope.trainingDialog.show();
-        var refreshIntervalId = setInterval(function(){$.when(serverInteractionService.getTrained()).done(function(response){
-            if(response){
-                clearInterval(refreshIntervalId);
-                $scope.trainingDialog.hide();
-            }
-        })}, 5000);
-        serverRunning();
+        startStreamingAndClassificationService();
+    }
 
+    $scope.startStreamingService = function()
+    {
+        startStreamingService();
     }
 
     $scope.stopService = function () {
         stopService();
-        serverRunning();
-
     }
 
-
-    function startService() {
-        var serviceSettings = $scope.filter;
+    function train(algorithm) {
         $.when(serverInteractionService.setItemsToTrain()).done(function(response){
-            console.log("Items Trained");
-            $.when(serverInteractionService.startService(serviceSettings)).done(function(response){
-                console.log("Server Started");
+            $.when(serverInteractionService.train(algorithm)).done(function(response){
+                console.log(algorithm+" trained");
+                checkTrainings();
             });
         });
     }
 
-    function stopService() {
-        $.when(serverInteractionService.stopService(serviceSettings)).done(function(response){
-            console.log("Server Stopped");
-        });
-
+    function startStreamingAndClassificationService() {
+        var serviceSettings = $scope.filter;
+        if(JSON.parse($scope.filter).algorithm == "KNN"){
+            $.when(serverInteractionService.setItemsToTrain()).done(function(response){
+                $.when(serverInteractionService.startStreamingAndClassificationService(serviceSettings)).done(function(response){
+                    console.log("Server Started");
+                });
+            });
+        }else{
+            $.when(serverInteractionService.startStreamingAndClassificationService(serviceSettings)).done(function(response){
+                console.log("Server Started");
+            });
+        }
+        
     }
 
-    function serverRunning() {
-        $.when(serverInteractionService.serverRunning()).done(function(response){
+    function startStreamingService() {
+        var serviceSettings = $scope.filter;
+        $.when(serverInteractionService.startStreamingService(serviceSettings)).done(function(response){
+            console.log("Server Started");
+        });
+    }
+
+    function stopService() {
+        $.when(serverInteractionService.stopService()).done(function(response){
+            console.log("Server Stopped");
+        });
+    }
+
+    function checkTrainings() {
+        $.when(serverInteractionService.getTrainedByAlgorithm("SVM")).done(function(response){
             if(response){
-                $("[name='serverStatus']").bootstrapSwitch('readonly', false);
-                $("[name='serverStatus']").bootstrapSwitch('state', true);
-                $("[name='serverStatus']").bootstrapSwitch('readonly', true);
+                $("[name='svmTrained']").bootstrapSwitch('readonly', false);
+                $("[name='svmTrained']").bootstrapSwitch('state', true);
+                $("[name='svmTrained']").bootstrapSwitch('readonly', true);
             }else{
-                $("[name='serverStatus']").bootstrapSwitch('readonly', false);
-                $("[name='serverStatus']").bootstrapSwitch('state', false);
-                $("[name='serverStatus']").bootstrapSwitch('readonly', true);
+                $("[name='svmTrained']").bootstrapSwitch('readonly', false);
+                $("[name='svmTrained']").bootstrapSwitch('state', false);
+                $("[name='svmTrained']").bootstrapSwitch('readonly', true);
+            }
+        });
+        $.when(serverInteractionService.getTrainedByAlgorithm("NaiveBayes")).done(function(response){
+            if(response){
+                $("[name='naiveBayesTrained']").bootstrapSwitch('readonly', false);
+                $("[name='naiveBayesTrained']").bootstrapSwitch('state', true);
+                $("[name='naiveBayesTrained']").bootstrapSwitch('readonly', true);
+            }else{
+                $("[name='naiveBayesTrained']").bootstrapSwitch('readonly', false);
+                $("[name='naiveBayesTrained']").bootstrapSwitch('state', false);
+                $("[name='naiveBayesTrained']").bootstrapSwitch('readonly', true);
             }
         });
     }

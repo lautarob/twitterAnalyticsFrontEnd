@@ -44,9 +44,13 @@
                        <div>
                             <center>
                                 <span>
-                                    <button type="button" ng-click="startService()" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-play"></span> Start Service</button>
+                                    <button type="button" ng-click="startStreamingService()" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-play"></span> Fetch Data</button>
+                                    <button type="button" ng-click="startStreamingAndClassificationService()" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-play"></span> Start Classification Service</button>
                                     <button type="button" ng-click="stopService()" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-stop"></span> Stop Service</button>
-                                    <input type="checkbox" name="serverStatus" checked>
+                                    <input type="checkbox" name="svmTrained" checked>
+                                    <a  id="svmTrainButton" class="btn btn-primary">Train</a>
+                                    <input type="checkbox" name="naiveBayesTrained" checked>
+                                    <a id="naiveBayesTrainButton" class="btn btn-primary">Train</a>
                                 </span>
                             </center>
                         </div>

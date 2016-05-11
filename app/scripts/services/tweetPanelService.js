@@ -44,7 +44,7 @@ angular.module('twitterApp')
         deleteItem: function(item) {
             return $.ajax({
                 type: "DELETE",
-                url: "/items",
+                url: config.QUERIES_SERVER + "/items",
                 data: item,
                 dataType: "json"
             });

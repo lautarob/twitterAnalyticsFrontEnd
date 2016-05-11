@@ -126,16 +126,17 @@ angular.module('twitterApp')
                 var labelsTopics = [];
                 var dataCountTopics = [];
 
+                if (topicsBarChart != null && topicsRadarChart != null){
+                    topicsBarChart.destroy();
+                    topicsRadarChart.destroy();
+                }
+
                 if(results.length > 0){
                   for ( var i = 0, l = 10; i < results.length && i < 10 ; i++ ){
                     labelsTopics.push(results[i]["_id"]);
                     dataCountTopics.push(results[i]["count"]);
                   };
 
-                    if (topicsBarChart != null && topicsRadarChart != null){
-                        topicsBarChart.destroy();
-                        topicsRadarChart.destroy();
-                    }
                     var ctx = $("#topicsBarChart").get(0).getContext("2d");
                     var ctx2 = $("#topicsRadarChart").get(0).getContext("2d");
                     var data = {

@@ -29,14 +29,11 @@ angular.module('twitterApp')
                 fields: [
                     { name: "topics", type: "text", width: 100, editing: false, title: "Topics", css:"grid-cell-normal" },
                     { name: "entities", type: "text", width: 100, editing: false, title: "Entities", css:"grid-cell-normal"  },
-                    { name: "persons", type: "text", width: 100, editing: false, title: "Persons", css:"grid-cell-normal" },
-                    { name: "hashTags", type: "text", width: 100, editing: false, title: "#HashTags", css:"grid-cell-normal"  },
-                    { name: "twitterUsers", type: "text", width: 100, editing: false, title: "@User", css:"grid-cell-normal"  },
                     { name: "keyWords", type: "text", width: 100, editing: false, title: "KeyWords", css:"grid-cell-normal" },
                     { name: "originalText", type: "text", width: 100, editing: false, title: "Text", css:"grid-cell-normal" },
                     { name: "principal_topic", type: "text", width: 100, editing: true, title: "Principal Topic", css:"grid-cell-normal" },
                     { name: "to_train", type: "checkbox", width: 75, editing: true, title: "To Train", css:"grid-cell-normal" },
-                    { type: "control", width: 75, deleteButton: false }
+                    { type: "control", width: 75, deleteButton: true }
 
                 ]
             });

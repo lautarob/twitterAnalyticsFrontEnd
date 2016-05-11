@@ -9,14 +9,36 @@
 angular.module('twitterApp')
   .factory('serverInteractionService', function($http,config) {
      return {
-      startService: function(Filter) {
+      startStreamingService: function(Filter) {
       //return the promise directly.
         return $.ajax(
         {
           type: 'POST',
           data: Filter,
           contentType: 'application/json',
-          url: config.STREAMING_SERVER + '/start'
+          url: config.STREAMING_SERVER + '/startStreaming'
+        })
+      },
+
+      startStreamingAndClassificationService: function(Filter) {
+      //return the promise directly.
+        return $.ajax(
+        {
+          type: 'POST',
+          data: Filter,
+          contentType: 'application/json',
+          url: config.STREAMING_SERVER + '/startStreamingAndClassification'
+        })
+      },
+
+      train: function(algorithm) {
+      //return the promise directly.
+        return $.ajax(
+        {
+          type: 'POST',
+          data: { algorithm: algorithm },
+          dataType: 'json',
+          url: config.STREAMING_SERVER + '/train'
         })
       },
 
@@ -46,12 +68,14 @@ angular.module('twitterApp')
         })
       },
 
-      serverRunning: function() {
+      getTrainedByAlgorithm: function(algorithm) {
       //return the promise directly.
         return $.ajax(
         {
-          type: 'GET',
-          url: config.STREAMING_SERVER + '/serverRunning'
+          type: 'POST',
+          data: { algorithm: algorithm }, 
+          dataType: 'json',
+          url: config.STREAMING_SERVER + '/getTrainedByAlgorithm'
         })
       }
 
